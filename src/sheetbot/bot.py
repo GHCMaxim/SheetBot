@@ -62,7 +62,9 @@ async def help(ctx):
         name="read_max", value="Reads the current max entry number", inline=False
     )
     embed.add_field(
-        name="write <message>", value="Writes the message to the sheet", inline=False
+        name="write <message>",
+        value="Writes the message to the sheet. Please put the message in quotes.",
+        inline=False,
     )
     embed.add_field(
         name="add_wording", value="Increments the current wording count", inline=False
