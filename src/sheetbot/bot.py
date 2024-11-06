@@ -100,7 +100,7 @@ async def read(ctx, num):
         embed = discord.Embed(
             title=f"Entry {num}",
             description=f"{string_value[0]}",
-            color=discord.Color.green,
+            color=int("0x2ECC71", 16),
         )
         embed.set_footer(text=chosen_line)
         await ctx.send(embed=embed)
