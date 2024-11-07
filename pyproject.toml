@@ -11,6 +11,9 @@ dependencies = [
     "google-api-python-client>=2.151.0",
     "google-auth-httplib2>=0.2.0",
     "google-auth-oauthlib>=1.2.1",
+    "sqlalchemy>=2.0.36",
+    "pydantic>=2.9.2",
+    "psycopg2>=2.9.10",
 ]
 readme = "README.md"
 requires-python = ">= 3.8"
@@ -28,3 +31,6 @@ allow-direct-references = true
 
 [tool.hatch.build.targets.wheel]
 packages = ["src/sheetbot"]
+
+[tool.rye.scripts]
+bot = { cmd = "python src/sheetbot/bot.py" }

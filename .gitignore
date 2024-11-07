@@ -12,3 +12,4 @@ wheels/
 #enviroment files
 .env
 credentials.json
+quotes.txt

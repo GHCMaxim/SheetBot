@@ -14,6 +14,9 @@ load_dotenv()
 TOKEN = os.getenv("DISCORD_TOKEN")
 SHEET_ID = os.getenv("SHEET_ID")
 
+witty_quotes = open("quotes.txt", "r")
+quotes = witty_quotes.read().split("\n")
+
 used_symbol = "s>"
 
 spreadSrv, driveSrv = get_service()
@@ -25,23 +28,6 @@ intents.message_content = True
 client = discord.Client(intents=intents)
 bot = commands.Bot(command_prefix=used_symbol, intents=intents, help_command=None)
 
-write_to_sheet(
-    spreadSrv, SHEET_ID, "in sync!A26:C26", {"values": [["Hello", "", "World!"]]}
-)
-
-witty_lines = [
-    "This took way longer than I expected",
-    "This thing will probably break somewhere. I'm not sorry."
-    "I'm not sure what I'm doing",
-    "I'm not sure if this is even working",
-    "The numbers do be rising quick, huh.",
-    "*insert funny quote here*",
-    "This is a footer" "Made by Minim in a day of sudden interest!",
-    "!",
-    "ಠ⁠_⁠ಠ",
-]
-
-
 @bot.event
 async def on_ready():
     print(f"{bot.user.name} has connected to Discord!")
@@ -49,7 +35,7 @@ async def on_ready():
 
 @bot.command()
 async def help(ctx):
-    chosen_line = witty_lines[random.randint(0, len(witty_lines) - 1)]
+    chosen_line = quotes[random.randint(0, len(quotes) - 1)]
     embed = discord.Embed(
         title="Commands",
         description=f"Prefix: {used_symbol}",
@@ -72,6 +58,9 @@ async def help(ctx):
     embed.add_field(
         name="current_wording", value="Displays the current wording count", inline=False
     )
+    embed.add_field(
+        name="add_quote <quote>", value="Adds a quote to the list of quotes", inline=False
+    )
     embed.set_footer(text=chosen_line)
     await ctx.send(embed=embed)
 
@@ -83,7 +72,6 @@ async def ping(ctx):
 
 @bot.command()
 async def read_max(ctx):
-    # await ctx.send(get_sheet_values(spreadSrv, SHEET_ID, "in sync!E3:E3"))
     value = get_sheet_values(spreadSrv, SHEET_ID, "in sync!E3:E3")
     await ctx.send(f"Same count is currently at: {value["values"][0][0]}")
 
@@ -91,7 +79,7 @@ async def read_max(ctx):
 @bot.command()
 async def read(ctx, num):
     try:
-        chosen_line = witty_lines[random.randint(0, len(witty_lines) - 1)]
+        chosen_line = quotes[random.randint(0, len(quotes) - 1)]
         num = int(num)
         value = get_sheet_values(spreadSrv, SHEET_ID, f"in sync!C{num+2}")
         string_value = value["values"][0]
@@ -119,8 +107,6 @@ async def write(ctx, arg):
             await ctx.send("Invalid format")
             return
         arg = arg[1:end]
-    print(arg)
-    print(type(arg))
     current = get_sheet_values(spreadSrv, SHEET_ID, "in sync!E3:E3")
     current = int(current["values"][0][0])
     try:
@@ -130,16 +116,13 @@ async def write(ctx, arg):
             f"in sync!A{current+3}:C{current+3}",
             {"values": [[current + 1, "", arg]]},
         )
-        # Expect ctx in a "" form and can be multiple lines
     except Exception as e:
         await ctx.send(f"Failed to write to sheet: {e}")
         return
     await ctx.send(f"Successfully wrote entry {current+1} ")
 
 
-bot.command()
-
-
+@bot.command()
 async def add_wording(ctx):
     current = get_sheet_values(spreadSrv, SHEET_ID, "in sync!E4")
     current = int(current["values"][0][0])
@@ -152,14 +135,18 @@ async def add_wording(ctx):
         return
 
 
-bot.command()
-
-
+@bot.command()
 async def current_wording(ctx):
     current = get_sheet_values(spreadSrv, SHEET_ID, "in sync!E4")
     current = int(current["values"][0][0])
     await ctx.send(f"Current Wording! count: {current}")
     return
 
+@bot.command()
+async def add_quote(ctx, quote):
+    with open("quotes.txt", "a") as f:
+        f.write(f"\n{quote}")
+    await ctx.send("Quote added!")
+    quotes.append(quote)
 
 bot.run(TOKEN)
